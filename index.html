@@ -6,41 +6,179 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
     />
-    <title>AuraFrame - Luxury Photo Slideshow & PWA Mobile Gallery</title>
+    <title>AuraFrame - Luxury Photo Slideshow</title>
     <meta
       name="description"
-      content="Aplikasi PWA mobile galeri & pemutar slideshow foto mewah dengan latar dinamis frosted glass, transisi sinematik 6 detik, akses penyimpanan lokal HP, dan dukungan offline penuh."
+      content="Aplikasi PWA Mobile Galeri & Pemutar Slideshow Foto Mewah dengan Latar Dinamis Frosted Glass dan Dukungan Offline"
     />
-    <!-- Konfigurasi PWA & iOS Safari Standalone -->
     <meta name="theme-color" content="#0a0b0e" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="AuraFrame" />
 
-    <!-- Manifest & Ikon PWA -->
-    <link rel="manifest" href="/manifest.json" />
-    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
-    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <!-- File PWA dengan Relative Path untuk GitHub Pages -->
+    <link rel="manifest" href="./manifest.json" />
 
-    <!-- Tipografi Mewah: Playfair Display & Plus Jakarta Sans -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <!-- Tailwind Browser CDN agar styling mewah langsung aktif tanpa bundler -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,400&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,600;1,400&family=Plus+Jakarta+Sans:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
+    <style>
+      body {
+        background-color: #0a0b0e;
+        color: #ffffff;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        user-select: none;
+        -webkit-user-select: none;
+        touch-action: manipulation;
+      }
+    </style>
   </head>
-  <body class="bg-[#0a0b0e] text-white overflow-hidden select-none">
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+  <body class="relative w-screen h-screen overflow-hidden bg-[#0a0b0e]">
+    <!-- 1. Latar Belakang Dinamis Frosted Glass -->
+    <div id="dynamic-bg" class="absolute inset-0 z-0 transition-all duration-1000 ease-out pointer-events-none"></div>
+    <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-transparent to-black/80 pointer-events-none"></div>
+
+    <!-- 2. Frame Foto Utama (Ken Burns Sinematik) -->
+    <main class="relative z-10 flex items-center justify-center w-full h-full p-2 sm:p-8">
+      <div class="relative w-full h-full max-w-6xl max-h-[90vh] flex items-center justify-center overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 shadow-2xl backdrop-blur-sm">
+        <img
+          id="main-photo"
+          src=""
+          alt="Slideshow"
+          class="w-full h-full object-contain filter drop-shadow-2xl transition-opacity duration-700"
+        />
+
+        <!-- Info Nama & Counter Foto -->
+        <div class="absolute bottom-4 left-4 z-20 flex items-center gap-2">
+          <div class="px-3.5 py-1.5 rounded-full backdrop-blur-xl bg-black/60 border border-white/15 text-xs text-white/90 shadow-lg flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-[#d4af37] animate-pulse"></span>
+            <span id="photo-title" class="font-serif italic tracking-wide truncate max-w-[200px]">Memuat...</span>
+            <span class="text-white/40">|</span>
+            <span id="photo-counter" class="text-[#f6e09e] font-mono text-[11px]">1 / 1</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 3. Header Navbar Melayang -->
+    <header id="app-header" class="absolute top-0 inset-x-0 z-30 flex items-center justify-between p-4 sm:p-6 transition-all duration-500">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#996515] to-[#f6e09e] p-[1px] shadow-[0_0_15px_rgba(212,175,55,0.4)]">
+          <div class="w-full h-full bg-[#0c0e14] rounded-[11px] flex items-center justify-center text-[#f6e09e] font-bold text-xs">
+            AF
+          </div>
+        </div>
+        <span class="font-serif text-lg font-bold tracking-wider text-white">
+          Aura<span class="text-[#d4af37]">Frame</span>
+        </span>
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button id="pwa-install-btn" class="hidden px-3 py-1.5 rounded-full bg-gradient-to-r from-[#d4af37] to-[#f6e09e] text-black font-semibold text-xs shadow-md cursor-pointer">
+          Pasang PWA
+        </button>
+
+        <button id="audio-btn" class="w-9 h-9 rounded-full flex items-center justify-center bg-black/40 border border-white/15 text-white/50 hover:text-white backdrop-blur-xl transition cursor-pointer" title="Suara Ambient">
+          <svg class="w-4 h-4 fill-currentColor" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z"/></svg>
+        </button>
+
+        <button id="fullscreen-btn" class="w-9 h-9 rounded-full flex items-center justify-center bg-black/40 border border-white/15 text-white/80 hover:text-white backdrop-blur-xl transition cursor-pointer" title="Layar Penuh">
+          <svg class="w-4 h-4 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/></svg>
+        </button>
+
+        <button id="drawer-btn" class="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/20 text-white text-xs font-medium backdrop-blur-xl transition cursor-pointer flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 text-[#f6e09e] fill-currentColor" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+          Galeri
+        </button>
+      </div>
+    </header>
+
+    <!-- 4. Panel Kontrol Bawah (Progress Bar 6 Detik & Floating Controller) -->
+    <footer id="app-footer" class="absolute bottom-0 inset-x-0 z-30 flex flex-col items-center pb-4 sm:pb-6 px-4 transition-all duration-500">
+      <!-- Progress Bar 6 Detik Persis -->
+      <div class="w-full max-w-sm sm:max-w-md mb-3 px-2">
+        <div class="flex items-center justify-between text-[11px] text-white/60 mb-1 font-mono">
+          <span>Slideshow Otomatis (6 Detik)</span>
+          <span id="time-text" class="text-[#f6e09e]">0s / 6s</span>
+        </div>
+        <div class="relative w-full h-1.5 bg-white/10 rounded-full overflow-hidden backdrop-blur-md">
+          <div id="progress-bar" class="absolute left-0 top-0 bottom-0 bg-gradient-to-r from-[#d4af37] to-[#f6e09e] rounded-full transition-all duration-75 ease-linear w-0 shadow-[0_0_10px_rgba(212,175,55,0.8)]"></div>
+        </div>
+      </div>
+
+      <!-- Tombol Pemutar Melayang -->
+      <div class="flex items-center gap-4 px-5 py-2.5 rounded-full backdrop-blur-2xl bg-black/60 border border-white/20 shadow-2xl">
+        <button id="prev-btn" class="p-2 rounded-full hover:bg-white/10 text-white/80 transition cursor-pointer" title="Sebelumnya">
+          <svg class="w-5 h-5 fill-currentColor" viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6l8.5 6V6z"/></svg>
+        </button>
+
+        <button id="play-btn" class="w-12 h-12 rounded-full bg-gradient-to-tr from-[#996515] via-[#d4af37] to-[#f6e09e] flex items-center justify-center text-black font-bold shadow-[0_0_20px_rgba(212,175,55,0.6)] hover:scale-105 active:scale-95 transition cursor-pointer" title="Play / Pause">
+          <svg id="play-icon" class="w-5 h-5 fill-black" viewBox="0 0 24 24"><path d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+        </button>
+
+        <button id="next-btn" class="p-2 rounded-full hover:bg-white/10 text-white/80 transition cursor-pointer" title="Selanjutnya">
+          <svg class="w-5 h-5 fill-currentColor" viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zM16 6v12h2V6h-2z"/></svg>
+        </button>
+
+        <div class="h-5 w-px bg-white/20"></div>
+
+        <!-- Tombol Akses Memori Galeri HP -->
+        <button id="pick-photo-btn" class="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-[#d4af37] hover:text-black text-xs font-medium transition cursor-pointer">
+          <svg class="w-3.5 h-3.5 stroke-current fill-none" stroke-width="2" viewBox="0 0 24 24"><path d="M12 5v14m-7-7h14"/></svg>
+          <span>Pilih Foto HP</span>
+        </button>
+      </div>
+
+      <!-- Scrubber Thumbnail Strip -->
+      <div class="w-full max-w-2xl mt-3 px-4">
+        <div id="thumbnail-strip" class="flex items-center gap-2 overflow-x-auto py-1 no-scrollbar"></div>
+      </div>
+    </footer>
+
+    <!-- 5. Drawer Galeri & Pengaturan Efek -->
+    <aside id="app-drawer" class="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-[#0c0e14]/95 border-l border-[#d4af37]/30 p-5 flex flex-col transition-transform duration-300 backdrop-blur-2xl translate-x-full">
+      <div class="flex items-center justify-between pb-4 border-b border-white/10">
+        <h2 class="text-base font-semibold text-white">Galeri & Visual</h2>
+        <button id="close-drawer-btn" class="p-1 rounded-full text-white/60 hover:text-white cursor-pointer">✕</button>
+      </div>
+
+      <div class="py-4 border-b border-white/10 space-y-3 text-xs">
+        <span class="text-[#f6e09e] uppercase font-semibold text-[10px] tracking-wider block">Efek Latar Dinamis</span>
+        <div>
+          <div class="flex justify-between text-white/70 mb-1">
+            <span>Tingkat Blur</span>
+            <span id="blur-val" class="text-[#f6e09e] font-mono">48px</span>
+          </div>
+          <input id="blur-slider" type="range" min="10" max="90" value="48" class="w-full accent-[#d4af37]" />
+        </div>
+        <div>
+          <div class="flex justify-between text-white/70 mb-1">
+            <span>Opasitas Gelap</span>
+            <span id="dark-val" class="text-[#f6e09e] font-mono">65%</span>
+          </div>
+          <input id="dark-slider" type="range" min="0.2" max="0.9" step="0.05" value="0.65" class="w-full accent-[#d4af37]" />
+        </div>
+      </div>
+
+      <div class="flex-1 overflow-y-auto py-4">
+        <span class="text-xs text-white/70 block mb-3 font-medium">Koleksi Slide Aktif</span>
+        <div id="drawer-photo-list" class="grid grid-cols-2 gap-2"></div>
+      </div>
+    </aside>
+
+    <input id="file-input" type="file" accept="image/*" multiple class="hidden" />
+
+    <!-- Skrip Modular Eksekusi -->
+    <script type="module" src="./app.js"></script>
     <script>
-      // Registrasi Service Worker Otomatis
       if ('serviceWorker' in navigator && window.location.protocol.startsWith('http')) {
         window.addEventListener('load', () => {
-          navigator.serviceWorker.register('/sw.js').catch(console.warn);
+          navigator.serviceWorker.register('./sw.js').catch(console.warn);
         });
       }
     </script>
   </body>
-</html>
+  </html>
